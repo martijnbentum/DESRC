@@ -1,3 +1,4 @@
+import locations
 import mne
 import numpy as np
 import os
@@ -73,7 +74,7 @@ def make_eeg_word_epochs(block, channel_set = [],remove_bad_ch = True,
     if not block.ica_applied:
         print('could not load and apply ica',block.__repr__())
         return
-    rbch = remove_bad_ch
+    rbch = remove_bad_ch if remove_bad_ch else []
     t = raw2np(block.raw, keep_channels = channel_set, remove_bad_ch = rbch)
     block.data,block.ch,block.removed_ch = t
     if verbose: print('excluded words:')
@@ -149,7 +150,7 @@ def raw2np(raw, keep_channels = 'all', remove_bad_ch = True):
     if remove_bad_ch: remove_ch.extend(raw.info['bads'])
     ch_mask = [ch not in remove_ch for ch in ch_names]
     ch_names = [ch for ch in ch_names if not ch in remove_ch]
-    print('selected channels:',' '.join(ch_names))
+    print('selected channels:',' '.join(ch_names), len(ch_mask))
     print('removed channels:',' '.join(remove_ch))
     return data[ch_mask,:], ch_names, remove_ch
     
@@ -157,14 +158,17 @@ def raw2np(raw, keep_channels = 'all', remove_bad_ch = True):
 def load_channel_set(set_type = 'all'):
     '''load names of the EEG channels.
     set_type    the channel set to load
-        all         contains all channel names
-        default     contains the relevant eeg channel subset
+    all         contains all channel names
+    default     contains the relevant eeg channel subset
     '''
     if set_type == 'all':
-        ch = open('EEG_DATA_ifadv_cgn/channel_names.txt').read().split('\n')
-        assert len(ch) == 31
+        f = locations.other_files_dir + 'channel_names.txt'
+        ch = open(f).read().split('\n')
+        ch.pop(ch.index('STI 014'))
+        assert len(ch) == 30
     elif set_type == 'default':
-        ch = open('EEG_DATA_ifadv_cgn/channel_set_default.txt').read()
+        f = locations.other_files_dir + 'channel_set_default.txt'
+        ch = open(f).read()
         ch = ch.split('\n')[:-1]
         assert len(ch) == 25
     else: print('unknown set type',set_type)
@@ -226,7 +230,7 @@ def load_block(block, sf= 1000,freq = [0.05,30]):
         print('resampling data to sf:',sf)
         raw.resample(sfreq = sf)
 
-    m = mne.channels.read_montage('easycap-M1')
+    m = mne.channels.make_standard_montage('easycap-M1')
     raw.set_montage(m)
     return raw
 
