@@ -75,7 +75,7 @@ def read_blocks(pp_id = 1, add_words = False,get_names = False):
                 o = _add_corpus_location_to_filename(o)
             setattr(block,name,o)
         block.xml_filename = filename
-        if add_words: setattr(block,'words',read_words(block.name))
+        if add_words: setattr(block,'words',read_words(block))
         blocks.append(block)    
     return blocks
 
@@ -153,7 +153,7 @@ def read_sessions(pp_id = 1):
         
 
         
-def read_words(block_name = 'pp1_exp-o_bid-1'):
+def read_words(block = None):
     '''Participants listened to speech.
     Each word in the speech materials is time locked to the EEG materials
     Words are grouped within a block (~15 minutes of the EEG experiment)
@@ -164,6 +164,8 @@ def read_words(block_name = 'pp1_exp-o_bid-1'):
 
     Words can be read by providing a block name
     '''
+    if not block:block_name = 'pp1_exp-o_bid-1'
+    else: block_name = block.name
     words = []
     pp_id = int(block_name.split('_')[0].strip('p'))
     pp_dir = pp_dirs[pp_id]
@@ -195,6 +197,7 @@ def read_words(block_name = 'pp1_exp-o_bid-1'):
         setattr(word,'ppl',_read_ppl(w))
         setattr(word,'phoneme_word',_read_phoneme_word(w))
         setattr(word,'name',w.attrib['id'])
+        word.block = block
         word.xml_filename = filename
         words.append(word)
     return words
@@ -305,7 +308,7 @@ class dummy_object():
         self.name = name
 
     def __repr__(self):
-        if '_help' in self.object_type: name = 'field explanations'
+        if 'explanation' in self.object_type: name = 'field explanations'
         else: name = self.name
         m = self.object_type + ': ' + name
         return m
@@ -328,12 +331,9 @@ class dummy_object():
             m += ' '.join(nested_objects)
         return m
 
-    @property
-    def help(self):
+    def explanation(self):
         '''show explanation for each field of an object.'''
-        if not hasattr(self,'_help'): 
-            self._help = make_help(self)
-        print(self._help)
+        print(make_help(self))
     
         
 
@@ -341,7 +341,7 @@ def make_help(obj):
     '''create field explanation for an object (e.g. block)'''
     object_type= obj.object_type
     f = locations.metadata_xml_dir + 'info_explanation.xml'
-    helper = dummy_object(object_type+ '_help')
+    helper = dummy_object('explanation')
     xml_help = etree.fromstring(open(f).read())
     tags = [x.tag for x in xml_help.getchildren()]
     if not object_type in tags: return 'no help available'
