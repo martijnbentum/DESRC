@@ -3,6 +3,10 @@ import os
 
 #change this to the directory of the corpus
 corpus_dir= '../../BAK/'
+#change this to the directory of the CGN audio files:
+cgn_audio= '/vol/bigdata/corpora2/CGN2/data/audio/wav/'
+#change this to the directory of the IFADV audio files:
+ifadv_audio = '/vol/tensusers/mbentum/IFADV/WAV_16KHZ/'
 
 #you do not need to change this
 eeg_dir = corpus_dir + 'EEG/'
@@ -13,6 +17,9 @@ ica_dir = other_files_dir + 'ICA_SOLUTIONS/'
 info_dir = other_files_dir + 'INFO/'
 log_dir = other_files_dir + 'log/'
 metadata_xml_dir = corpus_dir + 'XML_INFO/'
+
+comp_o= cgn_audio + 'comp-o/nl/'
+comp_k= cgn_audio + 'comp-k/nl/'
 
 fn = glob.glob(metadata_xml_dir + '*')
 participant_xml_dirs = [x for x in fn if os.path.isdir(x)]
