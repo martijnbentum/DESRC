@@ -53,9 +53,9 @@ import load_eeg
 p1 = load_participant(pp_id = 1, add_words = True)
 ```
 
-This loads the metadata available for a participant. If add_words is true, the information for all words in the speech materials is loaded (this can take some time).
+This loads the metadata available for participant 1. If add_words is true, the information for all words in the speech materials is loaded (this can take some time).
 
-the participant object contains _sessions_ (recording sessions during which participant listened to a specific speech register (e.g. spontanuous dialogues), _blocks_ a continuous stretch of EEG recording during which participants listened to speech. _words_ a list of word object, each word object contains information linking the audio to the eeg and general word information. A _session_, _block_ and _word_ object contain the method _explanation()_ with information for all fields contained by the object
+the participant object contains _sessions_ a recording session consisted of a single lab visit, during  which the participant listened to several blocks of speech materials of a specific speech register (e.g. spontanuous dialogues), _blocks_ a continuous stretch of EEG recording during which participants listened to speech. _words_ a list of word objects, each word object contains information linking the word to the audio and the eeg materials, also provides some general word information. A _session_, _block_ and _word_ object contain the method _explanation()_ with information for all fields contained by the respective objects.
 
 ```python
 # load the EEG data for 1 participant
@@ -64,7 +64,7 @@ the participant object contains _sessions_ (recording sessions during which part
 load_eeg.load_word_epochs_participant(p1, unload_eeg = False)
 ```
 
-The EEG data is loaded for each block. If unload_eeg data = False, the data for a _block_ can be found under _data_ attribute in the _block_ object. The data is also present as an MNE object under the _raw_ attribute also attached to the _block_ object. The _data_ numpy matrix only contains data from good electrodes. The list of electrodes can be found under _ch_, the rejected channels can be found under _reject_channels_.
+The EEG data is loaded for each block. If unload_eeg data = False, the data for the whole _block_ can be found under _data_ attribute in the _block_ object. The data is also present as an MNE object under the _raw_ attribute also attached to the _block_ object. The _data_ numpy matrix only contains data from good electrodes. The list of electrodes can be found under _ch_, the rejected channels can be found under _reject_channels_.
 
 ```python
 # get the first block
@@ -90,14 +90,14 @@ w.explanation() # show information about all fields of a word
 ```
 
 
-The data is annotated for artefacts. The start and index for artefacts are listed under _artefact_st_ (artefact start time) and _artefact_et_ (artefact end time). These indices can be used to slice out EEG materials with artefact from the _data_ numpy matrix.
+The data is annotated for artefacts. The start and index for artefacts are listed under _artefact_st_ (artefact start time) and _artefact_et_ (artefact end time). These indices can be used to slice out EEG materials with artefacts from the _data_ numpy matrix.
 
 ```python
 index = b.artefact_st[0] # start index of the artefact
 first_clean_section = b.data[:,:index] # select the first stretch of clean EEG data from the block
 ```
 
-The data is also epoched into word epochs. The epochs can be found under _extracted_eeg_words_ which is a list of numpy matrices. The epoch start 300 ms before word onset and ends 1000ms after word onset. The channel set for each word is identical for a given block, but can differ between blocks (because different electrodes could be faulty in different blocks). The channels listed in b.ch correspond to the rows in the matrix. With _extracted_word_indeces_ you can find the word that corresponds to the eeg data.
+The data is also epoched into word epochs. The epochs can be found under _extracted_eeg_words_ which is a list of numpy matrices. The epoch starts at 300 ms before word onset and ends at 1000ms after word onset. The channel set for each word is identical for a given block, but can differ between blocks (because different electrodes could be faulty in different blocks). The channels listed in b.ch correspond to the rows in the matrix. With _extracted_word_indeces_ you can find the word that corresponds to the eeg data.
 
 ```python
 epoch = b.extracted_eeg_words[0]
