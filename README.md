@@ -32,8 +32,8 @@ https://doi.org/10.34973/97pv-jw72
 
 ### Loading data
 
-Clone the repository and update the directories in locations.py
-The corpus directory is important to update to be able to update.
+Clone the repository and update the directories in locations.py.
+Update the corpus_dir to the path where you downloaded the corpus.
 Updating cgn_audio and ifadv_audio is optional.
 
 ```python
