@@ -36,8 +36,8 @@ https://doi.org/10.34973/97pv-jw72
 import read_xml
 import load_eeg
 
+# Loading metadata for 1 participant
 p1 = load_participant(pp_id = 1, add_words = True)
-load_eeg.load_word_epochs_participant(p1, unload_eeg = False)
 ```
 
 This loads the metadata available for a participant. If add_words is true, the information for all words in the speech materials is loaded (this can take some time).
@@ -45,5 +45,18 @@ This loads the metadata available for a participant. If add_words is true, the i
 the participant object contains _sessions_ (recording sessions during which participant listened to a specific speech register (e.g. spontanuous dialogues), _blocks_ a continuous stretch of EEG recording during which participants listened to speech. _words_ a list of word object, each word object contains information linking the audio to the eeg and general word information. A _session_, _block_ and _word_ object contain the method _explanation()_ with information for all fields contained by the object
 
 ```python
+# load the EEG data for 1 participant
+# Filters the EEG data with a Butterworth bandpass filter (0.05 - 30 Hz) and applies ICA decomposition to remove eye blinks
+
 load_eeg.load_word_epochs_participant(p1, unload_eeg = False)
+
+```
+
+The EEG data is loaded for each block. If unload_eeg data = False, the data can be found under _data_ attribute under _block_
+
+```python
+# get the first block
+b = p1.blocks[0]
+b.data # numpy matrix channels X sample
+b.ch # list of channel names - index corresponds with the index of data
 ```
