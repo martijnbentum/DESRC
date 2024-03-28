@@ -32,6 +32,19 @@ https://doi.org/10.34973/97pv-jw72
 
 ### Loading data
 
+Clone the repository and update the directories in locations.py
+The corpus directory is important to update to be able to update.
+Updating cgn_audio and ifadv_audio is optional.
+
+```python
+#change this to the directory of the corpus
+corpus_dir= ''
+#change this to the directory of the CGN audio files:
+cgn_audio= ''
+#change this to the directory of the IFADV audio files:
+ifadv_audio = ''
+```
+
 ```python
 import read_xml
 import load_eeg
