@@ -100,9 +100,9 @@ first_clean_section = b.data[:,:index] # select the first stretch of clean EEG d
 The data is also epoched into word epochs. The epochs can be found under _extracted_eeg_words_ which is a list of numpy matrices. The epoch starts at 300 ms before word onset and ends at 1000ms after word onset. The channel set for each word is identical for a given block, but can differ between blocks (because different electrodes could be faulty in different blocks). The channels listed in b.ch correspond to the rows in the matrix. With _extracted_word_indeces_ you can find the word that corresponds to the eeg data.
 
 ```python
-epoch = b.extracted_eeg_words[0]
-index = b.extracted_word_indices[0]
-word = b.words[index]
+epoch = b.extracted_eeg_words[0] # numpy matrix channels X samples
+index = b.extracted_word_indices[0] # word index for this epoch
+word = b.words[index] # word metadata can be found in the word object
 ```
 
 
