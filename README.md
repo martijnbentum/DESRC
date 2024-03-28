@@ -49,14 +49,47 @@ the participant object contains _sessions_ (recording sessions during which part
 # Filters the EEG data with a Butterworth bandpass filter (0.05 - 30 Hz) and applies ICA decomposition to remove eye blinks
 
 load_eeg.load_word_epochs_participant(p1, unload_eeg = False)
-
 ```
 
-The EEG data is loaded for each block. If unload_eeg data = False, the data can be found under _data_ attribute under _block_
+The EEG data is loaded for each block. If unload_eeg data = False, the data for a _block_ can be found under _data_ attribute in the _block_ object. The data is also present as an MNE object under the _raw_ attribute also attached to the _block_ object. The _data_ numpy matrix only contains data from good electrodes. The list of electrodes can be found under _ch_, the rejected channels can be found under _reject_channels_.
 
 ```python
 # get the first block
 b = p1.blocks[0]
 b.data # numpy matrix channels X sample
 b.ch # list of channel names - index corresponds with the index of data
+b.rejected_channels # list of channels that were rejected 
+
+b.raw # mne object containing the same EEG data
+b.explanation() # show information about all fields of a block
+
 ```
+
+The whole section of EEG data precisely corresponds to the speech materials played during the block.
+
+```python
+b.wav_filename # the audio filename played during this block
+b.words # contains a list of words in the speech materials with information to link it to the EEG and audio
+w = b.words[0]
+w.st # start time in seconds
+w.st_sample # start index in b.data
+w.explanation() # show information about all fields of a word
+```
+
+
+The data is annotated for artefacts. The start and index for artefacts are listed under _artefact_st_ (artefact start time) and _artefact_et_ (artefact end time). These indices can be used to slice out EEG materials with artefact from the _data_ numpy matrix.
+
+```python
+index = b.artefact_st[0] # start index of the artefact
+first_clean_section = b.data[:,:index] # select the first stretch of clean EEG data from the block
+```
+
+The data is also epoched into word epochs. The epochs can be found under _extracted_eeg_words_ which is a list of numpy matrices. The epoch start 300 ms before word onset and ends 1000ms after word onset. The channel set for each word is identical for a given block, but can differ between blocks (because different electrodes could be faulty in different blocks). The channels listed in b.ch correspond to the rows in the matrix. With _extracted_word_indeces_ you can find the word that corresponds to the eeg data.
+
+```python
+epoch = b.extracted_eeg_words[0]
+index = b.extracted_word_indices[0]
+word = b.words[index]
+```
+
+
