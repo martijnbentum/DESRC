@@ -40,6 +40,29 @@ def unload_eeg_data(block):
     block.eeg_loaded = False
     block.ica_applied = False
 
+def load_eeg_data_block(block, bad_block_check = True, channel_set = [],
+    remove_bad_ch = True):
+    '''load the eeg data corresponding to a block.
+    block       block object created with read_xml
+    '''
+    if bad_block_check and block.usability in ['doubtfull','bad']:
+        print('skipping block because it is bad,', 
+            'force load by setting bad_block_check = False')
+        print('blocks with usability doubtfull or bad have poor eeg data')
+        return False
+    if channel_set == []: channel_set = load_channel_set('default')
+    if not hasattr(block,'raw'): add_eeg_data(block)
+    if block.raw == 0:
+        print('could not load eeg data',block.__repr__())
+        return 
+    if not block.ica_applied:
+        print('could not load and apply ica',block.__repr__())
+        return
+    rbch = remove_bad_ch if remove_bad_ch else []
+    t = raw2np(block.raw, keep_channels = channel_set, remove_bad_ch = rbch)
+    block.data,block.ch,block.removed_ch = t
+    return True
+
 def make_eeg_word_epochs(block, channel_set = [],remove_bad_ch = True,
     bad_block_check = True):
     '''Extract EEG data corresponding to words in the block.
@@ -61,22 +84,10 @@ def make_eeg_word_epochs(block, channel_set = [],remove_bad_ch = True,
     block.extracted_eeg_words = []
     block.extracted_word_indices = []
     block.bad_words = []
-    if bad_block_check and block.usability in ['doubtfull','bad']:
-        print('skipping block because it is bad,', 
-            'force load by setting bad_block_check = False')
-        print('blocks with usability doubtfull or bad have poor eeg data')
-        return False
-    if channel_set == []: channel_set = load_channel_set('default')
-    if not hasattr(block,'raw'): add_eeg_data(block)
-    if block.raw == 0:
-        print('could not load eeg data',block.__repr__())
-        return 
-    if not block.ica_applied:
-        print('could not load and apply ica',block.__repr__())
-        return
-    rbch = remove_bad_ch if remove_bad_ch else []
-    t = raw2np(block.raw, keep_channels = channel_set, remove_bad_ch = rbch)
-    block.data,block.ch,block.removed_ch = t
+    ok =load_eeg_data_block(block, bad_block_check = bad_block_check, 
+        channel_set = channel_set,remove_bad_ch = remove_bad_ch)
+    if not ok: return ok
+
     if verbose: print('excluded words:')
     for i, word in enumerate(block.words):
         check_word_usability(block,word)
@@ -358,6 +369,7 @@ def check_overlap(word,artefacts):
         artefact_overlap = compute_overlap(word.st_sample,
             word.et_sample,a_st,a_et)
         if artefact_overlap > 0: return True
+
 
 
 def compute_overlap(start_a,end_a,start_b, end_b):
