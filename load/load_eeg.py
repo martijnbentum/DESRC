@@ -1,4 +1,4 @@
-from . import locations
+from utils import locations
 import mne
 import numpy as np
 import os

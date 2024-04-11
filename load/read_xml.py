@@ -1,5 +1,5 @@
 from lxml import etree
-from . import locations 
+from utils import locations 
 
 pp_dirs = locations.participant_xml_dir_dict()
 
