@@ -1,8 +1,8 @@
-from . import locations
+import locations
 import mne
 import numpy as np
 import os
-from . import read_xml
+import read_xml
 
 verbose = False
 
